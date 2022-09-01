@@ -17,14 +17,18 @@ export const AddScoresForm: React.FC<IFormProps> = ({ onClose, open, players }) 
   const { create, loading } = useCreateScore();
 
   const onSubmit = (data: any) => {
-    create(data.playerOne, data.playerTwo, data.winner).then(x => {
+    if (data.playerOne && data.playerTwo && data.winner) {
+      create(data.playerOne, data.playerTwo, data.winner).then(x => {
+        onClose();
+      });
+    } else {
       onClose();
-    });
+    }
   };
   const initialValues = {
-    playerOne: {},
-    playerTwo: {},
-    winner: {},
+    playerOne: null,
+    playerTwo: null,
+    winner: null,
   };
 
   const options = React.useMemo(() => {
@@ -45,58 +49,73 @@ export const AddScoresForm: React.FC<IFormProps> = ({ onClose, open, players }) 
             onSubmit={onSubmit}
             initialValues={initialValues}
             validate={values => {
-              const hasValue = !!(values.playerOne && values.playerTwo && values.winner);
-              return hasValue ? undefined : { Error: 'Error' };
+              const errors: any = {};
+              if (!values.playerOne) {
+                errors.playerOne = 'Required';
+              }
+              if (!values.playerTwo) {
+                errors.playerTwo = 'Required';
+              }
+              if (!values.winner) {
+                errors.winner = 'Required';
+              }
+              return errors;
             }}
-            render={({ handleSubmit, form, submitting, pristine, values }) => (
-              <form onSubmit={handleSubmit} noValidate>
-                <Grid container rowSpacing={2}>
-                  <Grid item xs={12}>
-                    <Autocomplete
-                      name="playerOne"
-                      label="Player One"
-                      options={options}
-                      getOptionValue={x => x.value}
-                      getOptionLabel={(x: any) => x.name}
-                      isOptionEqualToValue={(o, v) => o.value === v.value}
-                    />
+            render={({ handleSubmit, form, submitting, pristine, values }) => {
+              console.log(values, options, 'Current Values');
+              return (
+                <form onSubmit={handleSubmit} noValidate>
+                  <Grid container rowSpacing={2}>
+                    <Grid item xs={12}>
+                      <Autocomplete
+                        name="playerOne"
+                        label="Player One"
+                        options={options}
+                        getOptionValue={x => x.value}
+                        getOptionLabel={(x: any) => x.name}
+                        required
+                        isOptionEqualToValue={(o, v) => o.value === v.value}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Autocomplete
+                        name="playerTwo"
+                        label="Player Two"
+                        options={options.filter(x => x?.value !== values?.playerOne)}
+                        getOptionValue={x => x.value}
+                        getOptionLabel={(x: any) => x.name}
+                        required
+                        isOptionEqualToValue={(o, v) => o.value === v.value}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Autocomplete
+                        name="winner"
+                        label="Winner"
+                        options={options.filter(x => x.value === values.playerOne || x.value === values.playerTwo)}
+                        getOptionValue={x => x.value}
+                        getOptionLabel={(x: any) => x.name}
+                        required
+                        isOptionEqualToValue={(o, v) => o.value === v.value}
+                      />
+                    </Grid>
                   </Grid>
-                  <Grid item xs={12}>
-                    <Autocomplete
-                      name="playerTwo"
-                      label="Player One"
-                      options={options}
-                      getOptionValue={x => x.value}
-                      getOptionLabel={(x: any) => x.name}
-                      isOptionEqualToValue={(o, v) => o.value === v.value}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Autocomplete
-                      name="winner"
-                      label="Winner"
-                      options={options}
-                      getOptionValue={x => x.value}
-                      getOptionLabel={(x: any) => x.name}
-                      isOptionEqualToValue={(o, v) => o.value === v.value}
-                    />
-                  </Grid>
-                </Grid>
-                <DialogActions style={{ marginTop: 24 }}>
-                  <Button variant="outlined" onClick={onClose}>
-                    Cancel
-                  </Button>
-                  <LoadingButton
-                    type="submit"
-                    loading={loading}
-                    loadingPosition="start"
-                    startIcon={<AddIcon />}
-                    variant="contained">
-                    Create
-                  </LoadingButton>
-                </DialogActions>
-              </form>
-            )}
+                  <DialogActions style={{ marginTop: 24 }}>
+                    <Button variant="outlined" onClick={onClose}>
+                      Cancel
+                    </Button>
+                    <LoadingButton
+                      type="submit"
+                      loading={loading}
+                      loadingPosition="start"
+                      startIcon={<AddIcon />}
+                      variant="contained">
+                      Create
+                    </LoadingButton>
+                  </DialogActions>
+                </form>
+              );
+            }}
           />
         </DialogContent>
       </Paper>
