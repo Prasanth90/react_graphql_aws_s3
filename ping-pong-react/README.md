@@ -1,6 +1,6 @@
 # Deployment
 
-- http://scores.staara.ca
+- Live demo at http://scores.staara.ca
 
 
 # npm start
