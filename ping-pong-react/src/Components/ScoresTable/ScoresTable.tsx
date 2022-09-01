@@ -6,15 +6,31 @@ import { AddScoresForm } from '../../Forms/AddScoresForm';
 import { LinearProgress } from '@mui/material';
 
 const columns: GridColDef[] = [
-  { field: 'id', headerName: 'ID', headerAlign: 'center', align: 'center', flex: 1 },
-  { field: 'firstName', headerName: 'First name', headerAlign: 'center', align: 'center', flex: 1 },
-  { field: 'lastName', headerName: 'Last name', headerAlign: 'center', align: 'center', flex: 1 },
+  {
+    field: 'firstName',
+    headerName: 'First name',
+    headerAlign: 'center',
+    align: 'center',
+    flex: 1,
+    sortable: false,
+    filterable: false,
+  },
+  {
+    field: 'lastName',
+    headerName: 'Last name',
+    headerAlign: 'center',
+    align: 'center',
+    flex: 1,
+    sortable: false,
+    filterable: false,
+  },
   {
     field: 'fullName',
     headerName: 'Full name',
     description: 'This column has a value getter and is not sortable.',
     sortable: false,
     headerAlign: 'center',
+    filterable: false,
     align: 'center',
     valueGetter: (params: GridValueGetterParams) => `${params.row.firstName || ''} ${params.row.lastName || ''}`,
     flex: 1,
@@ -25,6 +41,8 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     type: 'number',
     align: 'center',
+    sortable: false,
+    filterable: false,
     flex: 1,
   },
   {
@@ -33,6 +51,8 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     align: 'center',
     type: 'number',
+    sortable: false,
+    filterable: false,
     flex: 1,
   },
   {
@@ -41,12 +61,24 @@ const columns: GridColDef[] = [
     headerAlign: 'center',
     align: 'center',
     type: 'number',
+    sortable: false,
+    filterable: false,
+    flex: 1,
+  },
+  {
+    field: 'rank',
+    headerName: 'Rank',
+    headerAlign: 'center',
+    align: 'center',
+    type: 'number',
+    sortable: true,
+    filterable: false,
     flex: 1,
   },
 ];
 
 export const ScoresTable = () => {
-  const { getPlayers, data, loading, error } = useGetPlayers();
+  const { getPlayers, data, loading } = useGetPlayers();
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
 
   React.useEffect(() => {
@@ -54,11 +86,14 @@ export const ScoresTable = () => {
   }, []);
 
   const rows = React.useMemo(() => {
-    return data.map((x, i) => {
+    const players = [...data];
+    players.sort((a, b) => b.wins - a.wins);
+    return players.map((x, i) => {
       return {
         id: i,
         ...x,
         matches: x.wins + x.losses,
+        rank: i + 1,
       };
     });
   }, [data]);
@@ -66,8 +101,20 @@ export const ScoresTable = () => {
   return (
     <>
       <ScoresAppBar onAddScoreClicked={() => setIsOpen(true)} />
-      <div style={{ height: 'calc(100vh - 76px)', width: '100%' }}>
+      <div
+        style={{
+          height: 'calc(100vh - 65px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '100%',
+        }}>
         <DataGrid
+          initialState={{
+            sorting: {
+              sortModel: [{ field: 'rank', sort: 'asc' }],
+            },
+          }}
           components={{
             LoadingOverlay: LinearProgress,
           }}

@@ -41,7 +41,7 @@ export const AddScoresForm: React.FC<IFormProps> = ({ onClose, open, players }) 
   }, [players]);
 
   return (
-    <Dialog onClose={onClose} open={open} style={{ height: 600 }}>
+    <Dialog onClose={onClose} open={open} style={{ height: 800 }}>
       <Paper style={{ minWidth: 400 }}>
         <DialogTitle>Add New Result</DialogTitle>
         <DialogContent>
@@ -65,7 +65,7 @@ export const AddScoresForm: React.FC<IFormProps> = ({ onClose, open, players }) 
               console.log(values, options, 'Current Values');
               return (
                 <form onSubmit={handleSubmit} noValidate>
-                  <Grid container rowSpacing={2}>
+                  <Grid container rowSpacing={2} style={{ padding: 12 }}>
                     <Grid item xs={12}>
                       <Autocomplete
                         name="playerOne"
