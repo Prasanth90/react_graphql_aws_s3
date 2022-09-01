@@ -1,7 +1,7 @@
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import { ScoresAppBar } from '../../Bars/ScoresAppBar';
 import * as React from 'react';
-import { IPlayer } from '../../hooks/useGetPlayers';
+import { IPlayer, useGetPlayers } from '../../hooks/useGetPlayers';
 import { AddScoresForm } from '../../Forms/AddScoresForm';
 import { Button, LinearProgress, Paper, Typography } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
@@ -85,6 +85,7 @@ const columns: GridColDef[] = [
 
 export const ScoresTable = () => {
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
+  const { getPlayers, data } = useGetPlayers();
   const allPlayers: IPlayer[] = useSelector((state: IApplicationState) => state.playersState.players);
   const loading: boolean = useSelector((state: IApplicationState) => state.playersState.isLoading);
 
@@ -92,8 +93,9 @@ export const ScoresTable = () => {
   const getAllPlayersWithRank = React.useCallback(() => dispatch(actionCreators.getAllPlayers()), [dispatch]);
 
   React.useEffect(() => {
+    getPlayers();
     getAllPlayersWithRank();
-  }, [getAllPlayersWithRank]);
+  }, [getAllPlayersWithRank, getPlayers]);
 
   const rows = React.useMemo(() => {
     const players = [...allPlayers];
@@ -165,7 +167,7 @@ export const ScoresTable = () => {
           />
         </div>
         <AddScoresForm
-          players={allPlayers}
+          players={data}
           onClose={() => {
             setIsOpen(false);
             getAllPlayersWithRank();

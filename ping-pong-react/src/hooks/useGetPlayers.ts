@@ -14,34 +14,32 @@ export const useGetPlayers = () => {
   const [loading, setLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<any>();
 
-  const getPlayers = async () => {
+  const getPlayers = React.useCallback(async () => {
     try {
       setLoading(true);
       const response = await axios({
-        url: 'https:serverless.staara.ca/graphql',
+        url: 'https://serverless.staara.ca/graphql',
         method: 'post',
         data: {
           query: `
-                  query GetPlayersWithRank {
-                      playersWithRank {
+                  query GetPlayers {
+                      players {
                           firstName
                           lastName
                           playerId
-                          wins
-                          losses
                       }
                   }
                   `,
         },
       });
 
-      console.log(response);
-      setData(response.data.data.playersWithRank);
+      console.log(response, 'Hello');
+      setData(response.data.data.players);
       setLoading(false);
     } catch (e) {
       setError(e);
       setLoading(false);
     }
-  };
+  }, []);
   return { getPlayers, data, loading, error };
 };
